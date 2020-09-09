@@ -14,13 +14,15 @@ public class View
 	    
 		public void printMenu()
 		{
-			System.out.println("1. Crear Arreglo Dinamico de Strings");
-			System.out.println("2. Agregar String");
-			System.out.println("3. Buscar String");
-			System.out.println("4. Eliminar String");
-			System.out.println("5. Imprimir el Arreglo");
-			System.out.println("6. Exit");
+			System.out.println("0. Realizar la carga de las fuentes de datos de las peliculas");
+			System.out.println("1. Encontrar buenas películas");
+			System.out.println("2. Crear Ranking de películas");
+			System.out.println("3. Conocer a un director");
+			System.out.println("4. Conocer a un actor");
+			System.out.println("5. Entender un género cinematográfico");
+			System.out.println("6. Crear Ranking del género");
 			System.out.println("Dar el numero de opcion a resolver, luego oprimir tecla Return: (e.g., 1):");
+			
 		}
 
 		public void printMessage(String mensaje) {
