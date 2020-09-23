@@ -6,7 +6,7 @@ import java.util.Iterator;
  * 
  */
 
-public class ListaEncadenada <T extends Comparable<T>> implements Iterable<T>,Lista<T> {
+public class ListaEncadenada <T> implements Iterable<T>,Lista<T> {
 
 	private Nodo<T> head;
     private Nodo<T> tail;

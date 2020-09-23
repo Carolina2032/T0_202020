@@ -1,6 +1,6 @@
 package model.data_structures;
 
-public interface Lista <T extends Comparable<T>> {
+public interface Lista <T> {
 
 	/**
 	 * Agrega un elemento al inicio de la lista

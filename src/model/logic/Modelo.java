@@ -4,10 +4,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.Random;
 
 import model.data_structures.ArregloDinamico;
 import model.data_structures.IArregloDinamico;
+import model.data_structures.ListaEncadenada;
 import model.data_structures.ShellSort;
+import model.data_structures.TablaHashLinearProbing;
+import model.data_structures.TablaHashSeparateChaining;
 
 /**
  * Definicion del modelo del mundo
@@ -22,9 +27,11 @@ public class Modelo {
 
 	private ArregloDinamico <Integer> datos;
 
-	public static String ARCHIVO = "/Users/anabulla/Desktop/Estructuras/T2_202022/data/AllMovies.csv";
+	public static String ARCHIVO = "/Users/anabulla/reto2/T3_202020/data/AllMoviesFull.csv";
 
-
+	public TablaHashLinearProbing <String, Movie> LP;
+	
+	public TablaHashSeparateChaining<String, Movie> SC;
 
 	private Catalog catalogo;
 
@@ -38,6 +45,9 @@ public class Modelo {
 		datos = new ArregloDinamico <Integer> (7);
 		catalogo = new Catalog();
 		sort = new ShellSort();
+		LP = new TablaHashLinearProbing<String, Movie>(1);
+		SC = new TablaHashSeparateChaining<String, Movie>(1);
+		
 	}
 
 	/**
@@ -49,6 +59,8 @@ public class Modelo {
 		datos = new ArregloDinamico <Integer> (capacidad);
 		catalogo = new Catalog(capacidad);
 		sort = new ShellSort();
+		LP = new TablaHashLinearProbing<String, Movie>(1);
+		SC = new TablaHashSeparateChaining<String, Movie>(1);
 	}
 
 	/**
@@ -93,8 +105,11 @@ public class Modelo {
 	/**
 	 * Carga los datos
 	 */
-	public void cargaDatos() {
+	public String cargaDatos() {
 
+		int MLP = LP.M;
+		int MSC	= SC.M;
+				
 		Integer idPeliculaAct = -1; 
 
 		FileReader fr1 = null;
@@ -122,24 +137,44 @@ public class Modelo {
 				String[] atributos = lineaActual.split(";") ;
 				Movie peliculaAct = new Movie (Integer.parseInt(atributos[0])) ;
 				idPeliculaAct = Integer.parseInt(atributos[0]);
-
-
-				String [] generos = atributos[1].split(",");
-
+				
+				peliculaAct.setBudget(Double.parseDouble(atributos [1]));
+				
+				String [] generos = atributos[2].split(",");
 				ArregloDinamico<String> arregloGeneros = new ArregloDinamico <String>() ;
+				
 				for (String genero: generos ) {
 					arregloGeneros.addLast(genero );
 				}
 				peliculaAct.setGenre(arregloGeneros);
 
-				peliculaAct.setReleaseDate(atributos[2]);
-
-				peliculaAct.setTitle(atributos[3]);
-				peliculaAct.setVoteAverage(Double.parseDouble(atributos[4]));	
-				peliculaAct.setCount(Integer.parseInt(atributos [5]));
+				peliculaAct.setImbdID(atributos[3]);
+				peliculaAct.setLanguage(atributos[4]);
+				peliculaAct.setoriginalTitle(atributos[5]);
+				peliculaAct.setOverview(atributos[6]);
+				peliculaAct.setPopularity(atributos[7]);
+				peliculaAct.setProductionCompany(atributos[8]);
+				peliculaAct.setProductionCountry(atributos[9]);
+				peliculaAct.setReleaseDate(atributos[10]);
+				peliculaAct.setRevenue(Integer.parseInt(atributos[11]));
+				peliculaAct.setRunTime(Integer.parseInt(atributos[12]));
+				peliculaAct.setSpokenLanguage(atributos[13]);
+				peliculaAct.setStatus(atributos[14]);
+				peliculaAct.setTagLine(atributos[15]);
+				peliculaAct.setTitle(atributos[16]);
+				
+				peliculaAct.setVoteAverage(Double.parseDouble(atributos[17]));	
+				
+				peliculaAct.setCount(Integer.parseInt(atributos [18]));
+				peliculaAct.setProductionCompanies(Integer.parseInt(atributos[19]));
+				peliculaAct.setProductionCountries(Integer.parseInt(atributos[20]));
+				peliculaAct.setSpokenLanguages(Integer.parseInt(atributos[21]));
+				
+				
+				
 				ArregloDinamico<Actor> actores = peliculaAct.getActores();
 
-				for (int j = 6 ; j < 15; j++) {
+				for (int j = 22; j < 31; j++) {
 					Actor actorAct = new Actor(atributos [j],Integer.parseInt(atributos [j+1])); 
 					j++;
 					actores.addLast(actorAct);;
@@ -148,31 +183,37 @@ public class Modelo {
 
 				peliculaAct.setActores(actores);
 
-				peliculaAct.setNumberActors(Integer.parseInt(atributos[16]));
-				Director director = new Director (atributos[17],Integer.parseInt(atributos [18])) ;
+				peliculaAct.setNumberActors(Integer.parseInt(atributos[32]));
+				Director director = new Director (atributos[33],Integer.parseInt(atributos [34])) ;
 
 				peliculaAct.setDirectores(director);
-				peliculaAct.setNumberDirectors(Integer.parseInt(atributos[19]));
+				peliculaAct.setNumberDirectors(Integer.parseInt(atributos[35]));
 
-				Producer productor = new Producer (atributos [20]);
+				Producer productor = new Producer (atributos [36]);
 				peliculaAct.setProductor(productor);
 
-				peliculaAct.setNumberProducers(Integer.parseInt(atributos [21]));
+				peliculaAct.setNumberProducers(Integer.parseInt(atributos [37]));
 
-				ScreenPlay screenplay = new ScreenPlay (atributos[22]);
+				ScreenPlay screenplay = new ScreenPlay (atributos[38]);
 				peliculaAct.setScreenplay(screenplay);
 
-				Editor editor= new Editor (atributos[23]);
+				Editor editor= new Editor (atributos[39]);
 				peliculaAct.setEditor(editor);
 
 
 				catalogo.peliculas.addLast(peliculaAct);
-
-
+				
+				String key = peliculaAct.getProductionCompany()+ peliculaAct.getReleaseDate();
+				
+				LP.put(key, peliculaAct);
+				
+				SC.put(key, peliculaAct);
 			}
 
+			System.out.println("Total de películas encontradas: "+ catalogo.peliculas.size()+ "\n" + "\nPrimera película: "  + "\n" + catalogo.peliculas.firstElement().darInformacionReq1() + "\nUltima pelicula: "+ "\n" + catalogo.peliculas.lastElement().darInformacionReq1());
 
-
+			return "\n El numero de tuplas para la tabla LinearProbing fue: " + LP.size() + "\n El numero de tuplas para la tabla SeparateChaining fue: " + SC.size() + "\n El tamaño inicial en LinearProbing fue: " + MLP + "\n El tamaño inicial en SeparateChaining fue: " + MSC +  "\n El tamaño final en LinearProbing fue: " + LP.M + "\n El tamaño final en SeparateChaining fue: " + SC.M + "\n El factor de carga en LinearProbing fue: " + (LP.size()/LP.M) + "\n El factor de carga en SeparateChaining fue: " + (SC.size()/SC.M) + "\n El numero de rehashes en LinearProbing fue: " + LP.rehashes + "\n El numero de rehashes en SeparateChaining fue: " + SC.rehash ;
+			
 		}catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("error fatal: en pelicula " + idPeliculaAct + " descripción error: " + e.getMessage() );
@@ -184,11 +225,13 @@ public class Modelo {
 					fr2.close();
 				}
 			}
+			
 			catch (Exception e2) {
 				e2.printStackTrace();
 			}
+			
 		}
-		System.out.println("Total de películas encontradas: "+ catalogo.peliculas.size()+ "\n" + "\nPrimera película: "  + "\n" + catalogo.peliculas.firstElement().darInformacionBasica() + "\nUltima pelicula: "+ "\n" + catalogo.peliculas.lastElement().darInformacionBasica());
+		return "se presento un error";
 	}
 
 
@@ -217,7 +260,7 @@ public class Modelo {
 	 * @param nombreDirector nombre del director a buscar
 	 * @return 
 	 */
-	public String requerimiento1(String nombreDirector) {
+	public String requerimiento1Reto1(String nombreDirector) {
 
 		int contador=0;
 		Double sumatoriaVotos=0.0;
@@ -266,7 +309,7 @@ public class Modelo {
 	 * @return 
 	 */
 
-	public String requerimiento2 (int tipoComparacion, boolean ascendente, int numeroDatos ) {
+	public String requerimiento2Reto1 (int tipoComparacion, boolean ascendente, int numeroDatos ) {
 
 		String respuesta = "\nEl ranking de las " + numeroDatos + " películas son:" + " \n " ;
 
@@ -295,7 +338,7 @@ public class Modelo {
 	 * @return 
 	 */
 
-	public String requerimiento3(String nombreDirector ){
+	public String requerimiento3Reto1(String nombreDirector ){
 
 		String respuesta = "\nLas peliculas del director(a) " + nombreDirector + " son: " + "\n" ;
 		Integer contador = 0 ;
@@ -331,7 +374,7 @@ public class Modelo {
 	 * @param nombreActor nombre del actor a buscar
 	 * @return
 	 */
-	public String requerimiento4(String nombreActor){
+	public String requerimiento4Reto1(String nombreActor){
 
 		String respuesta = "\nLas películas del actor " + nombreActor + " son: " + "\n";
 		Integer contador = 0 ;
@@ -391,7 +434,7 @@ public class Modelo {
 	 * @return
 	 */
 
-	public String requerimiento5(String nombreGenero ){
+	public String requerimiento5Reto1(String nombreGenero ){
 
 		String respuesta = "\nLas películas asociadas al género " + nombreGenero + " son: "  + "\n";
 		Integer contador = 0 ;
@@ -436,7 +479,7 @@ public class Modelo {
 	 */
 
 
-	public String requerimiento6 (int tipoComparacion, boolean ascendente, int numeroDatos, String genero  ) {
+	public String requerimiento6Reto1 (int tipoComparacion, boolean ascendente, int numeroDatos, String genero  ) {
 
 		String respuesta = "\nEl ranking solicitado de las " + numeroDatos + " películas del género " + genero +  " son:" + " \n " ;
 		ArregloDinamico<Movie> peliculasGenero = new ArregloDinamico<Movie>();
@@ -489,5 +532,78 @@ public class Modelo {
 
 		return respuesta  ;
 
+	}
+	
+	
+	public void requerimiento1Reto2 (String productionCompany, String releaseDate) {
+		Integer contador =0;
+		String key = productionCompany + releaseDate;
+		ListaEncadenada <Movie> peliculas = LP.get(key);
+		 if (peliculas==null) {
+			 System.out.println("No se ha encontrado ninguna pelicula con compañia de produccion y fecha especificadas");
+		 }
+		 else {
+			 for(int i = 0; i<peliculas.size();i++) {
+				System.out.println("\nPelicula #: " + (i+1) + "\nInformacion pelicula: " + peliculas.getElement(i).darInformacionReq1()  );
+				contador++;
+				
+			 }
+			 System.out.println("\nEl número de películas encontradas: " + contador);
+		 }
+	}
+
+	public void requerimiento2Reto2 (String productionCompany, String releaseDate) {
+		Integer contador =0;
+		String key = productionCompany + releaseDate;
+		ListaEncadenada <Movie> peliculas = SC.get(key);
+		 if (peliculas==null) {
+			 System.out.println("No se ha encontrado ninguna pelicula con compañia de produccion y fecha especificadas");
+		 }
+		 else {
+			 for(int i = 0; i<peliculas.size();i++) {
+				System.out.println("\nPelicula #: " + (i+1) + "\nInformacion pelicula: " + peliculas.getElement(i).darInformacionReq1()  );
+				contador++;
+			 }
+			 System.out.println("\nEl número de películas encontradas: " + contador);
+		 }
+	}
+	
+	public void requerimiento3Reto2 () {
+		ListaEncadenada <String> keySetLP = (ListaEncadenada <String>)LP.keySet() ;
+		ListaEncadenada <String> keySetSC =  (ListaEncadenada <String>)SC.keySet() ;
+		Long inicio = System.currentTimeMillis();
+		
+		for (int i=0; i< 800;i++) {
+			String key = keySetLP.getElement((int)Math.random()*LP.size());
+			ListaEncadenada<Movie> consulta = LP.get(key);
+			
+		}
+		for (int i=0; i< 200;i++) {
+			byte[] array = new byte[7]; // length is bounded by 7
+			new Random().nextBytes(array);
+			String key = new String(array, Charset.forName("UTF-8"));
+			ListaEncadenada<Movie> consulta = LP.get(key);			
+		}
+		Long fin = System.currentTimeMillis();
+		Long tiempoConsultaLP = (fin-inicio)/1000;
+		inicio = System.currentTimeMillis();
+		
+		for (int i=0; i< 800;i++) {
+			String key = keySetSC.getElement((int)Math.random()*SC.size());
+			ListaEncadenada<Movie> consulta = SC.get(key);
+		}
+		
+		for (int i=0; i< 200;i++) {
+			byte[] array = new byte[7]; // length is bounded by 7
+			new Random().nextBytes(array);
+			String key = new String(array, Charset.forName("UTF-8"));
+			ListaEncadenada<Movie> consulta = SC.get(key);
+			
+		}
+		fin = System.currentTimeMillis();
+		Long tiempoConsultaSC = (fin-inicio)/1000;
+		
+		System.out.println("\nTiempo de consulta promedio de Linear Probing: " + tiempoConsultaLP + "\nTiempo de consulta promedio de Separate Chaining: " + tiempoConsultaSC );
+		
 	}
 }
